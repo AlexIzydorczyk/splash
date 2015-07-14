@@ -26,6 +26,8 @@ from splash import sentry
 from splash.render_options import RenderOptions, BadOption
 from splash.qtutils import clear_caches
 
+import threading
+
 if lua_is_supported():
     from splash.qtrender_lua import LuaRender
 else:
@@ -40,6 +42,158 @@ class _ValidatingResource(Resource):
             request.setResponseCode(400)
             return str(e) + "\n"
 
+class BaseRenderResourceBackground(_ValidatingResource):
+
+    isLeaf = True
+    content_type = "text/html; charset=utf-8"
+
+
+    def __init__(self, pool, max_timeout, is_proxy_request=False):
+        Resource.__init__(self)
+        self.pool = pool
+        self.js_profiles_path = self.pool.js_profiles_path
+        self.is_proxy_request = is_proxy_request
+        self.max_timeout = max_timeout
+
+    def render_GET(self, request):
+        #log.msg("%s %s %s %s" % (id(request), request.method, request.path, request.args))
+
+        request.starttime = time.time()
+        render_options = RenderOptions.fromrequest(request, self.max_timeout)
+        render_options.get_filters(self.pool)  # check filters earlier
+
+	
+        pool_d = self._getRender(request, render_options)
+	#pool_d = self._getRender(request, render_options)
+
+        #timeout = render_options.get_timeout()
+        #wait_time = render_options.get_wait()
+
+        #timer = reactor.callLater(timeout+wait_time, pool_d.cancel)
+        #pool_d.addCallback(self._cancelTimer, timer)
+        #pool_d.addCallback(self._writeOutput, request)
+        #pool_d.addErrback(self._timeoutError, request)
+        #pool_d.addErrback(self._renderError, request)
+        #pool_d.addErrback(self._badRequest, request)
+        #pool_d.addErrback(self._internalError, request)
+        #pool_d.addBoth(self._finishRequest, request)
+        return "Lua Server Started"
+
+    def render_POST(self, request):
+        if self.is_proxy_request:
+            # If request comes from splash proxy service don't handle
+            # special content-types.
+            # TODO: pass http method to RenderScript explicitly.
+            return self.render_GET(request)
+
+        content_type = request.getHeader('content-type')
+        if not any(ct in content_type for ct in ['application/javascript', 'application/json']):
+            request.setResponseCode(415)
+            request.write("Request content-type not supported\n")
+            return
+
+        return self.render_GET(request)
+
+    def _cancelTimer(self, _, timer):
+        #log.msg("_cancelTimer")
+        timer.cancel()
+        return _
+
+    def _writeOutput(self, data, request, content_type=None):
+        # log.msg("_writeOutput: %s" % id(request))
+
+        if content_type is None:
+            content_type = self.content_type
+
+        if isinstance(data, (dict, list)):
+            data = json.dumps(data, cls=SplashJSONEncoder)
+            return self._writeOutput(data, request, "application/json")
+
+        if isinstance(data, tuple) and len(data) == 3:
+            data, content_type, headers = data
+
+            for name, value in headers:
+                request.setHeader(name, value)
+            return self._writeOutput(data, request, content_type)
+
+        if isinstance(data, (bool, int, long, float, types.NoneType)):
+            return self._writeOutput(str(data), request, content_type)
+
+        if isinstance(data, BinaryCapsule):
+            return self._writeOutput(data.data, request, content_type)
+
+        request.setHeader("content-type", content_type)
+
+        self._logStats(request)
+        request.write(data)
+
+    def _logStats(self, request):
+        stats = {
+            "path": request.path,
+            "args": request.args,
+            "rendertime": time.time() - request.starttime,
+            "maxrss": resource.getrusage(resource.RUSAGE_SELF).ru_maxrss,
+            "load": os.getloadavg(),
+            "fds": get_num_fds(),
+            "active": len(self.pool.active),
+            "qsize": len(self.pool.queue.pending),
+            "_id": id(request),
+        }
+        log.msg(json.dumps(stats), system="stats")
+
+    def _timeoutError(self, failure, request):
+        failure.trap(defer.CancelledError)
+        request.setResponseCode(504)
+        request.write("Timeout exceeded rendering page\n")
+        #log.msg("_timeoutError: %s" % id(request))
+
+    def _renderError(self, failure, request):
+        failure.trap(RenderError)
+        request.setResponseCode(502)
+        request.write("Error rendering page\n")
+        #log.msg("_renderError: %s" % id(request))
+
+    def _internalError(self, failure, request):
+        request.setResponseCode(500)
+        request.write(failure.getErrorMessage())
+        log.err()
+        sentry.capture(failure)
+
+    def _badRequest(self, failure, request):
+        failure.trap(BadOption)
+        request.setResponseCode(400)
+        request.write(str(failure.value) + "\n")
+
+    def _finishRequest(self, _, request):
+        if not request._disconnected:
+            request.finish()
+        #log.msg("_finishRequest: %s" % id(request))
+
+    def _getRender(self, request, options):
+        raise NotImplementedError()
+
+class ExecuteLuaScriptResourceBackground(BaseRenderResourceBackground):
+
+    content_type = "text/plain; charset=utf-8"
+
+    def __init__(self, pool, is_proxy_request, sandboxed,
+                 lua_package_path,
+                 lua_sandbox_allowed_modules,
+                 max_timeout):
+        BaseRenderResourceBackground.__init__(self, pool, max_timeout, is_proxy_request)
+        self.sandboxed = sandboxed
+        self.lua_package_path = lua_package_path
+        self.lua_sandbox_allowed_modules = lua_sandbox_allowed_modules
+
+    def _getRender(self, request, options):
+        params = dict(
+            proxy = options.get_proxy(),
+            lua_source = options.get_lua_source(),
+            sandboxed = self.sandboxed,
+            lua_package_path = self.lua_package_path,
+            lua_sandbox_allowed_modules = self.lua_sandbox_allowed_modules,
+        )
+        return self.pool.render(LuaRender, options, **params)
 
 class BaseRenderResource(_ValidatingResource):
 
@@ -591,6 +745,16 @@ class Root(Resource):
 
         if self.lua_enabled and ExecuteLuaScriptResource is not None:
             self.putChild("execute", ExecuteLuaScriptResource(
+                pool=pool,
+                is_proxy_request=False,
+                sandboxed=lua_sandbox_enabled,
+                lua_package_path=lua_package_path,
+                lua_sandbox_allowed_modules=lua_sandbox_allowed_modules,
+                max_timeout=max_timeout
+            ))
+	
+	if self.lua_enabled and ExecuteLuaScriptResourceBackground is not None:
+            self.putChild("execute_background", ExecuteLuaScriptResourceBackground(
                 pool=pool,
                 is_proxy_request=False,
                 sandboxed=lua_sandbox_enabled,
