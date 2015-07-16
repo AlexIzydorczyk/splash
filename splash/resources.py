@@ -56,11 +56,23 @@ class QueueRenderResource(_ValidatingResource):
         self.js_profiles_path = self.pool.js_profiles_path
         self.is_proxy_request = is_proxy_request
         self.max_timeout = max_timeout
+
         self.local_hostname = socket.gethostname()
+        self.redis = redis.Redis(host='10.10.170.118', port=6379)
 
     def render_GET(self, request):
-        
-        return "Your hostname is " + self.local_hostname + "Thanks for calling " + request.args.keys()[0]
+
+        request.responseHeaders.addRawHeader("content-type", "application/json")
+
+        if not request.args.keys['url']:
+            request.setResponseCode(400, "Bad Request")
+            return
+
+
+        self.redis.rpush(self.local_hostname, request.args.keys['url'])
+
+        return json.dumps(json.loads({'Status':'Submitted to Queue'}))
+
 
 
 class BaseRenderResourceBackground(_ValidatingResource):
