@@ -64,12 +64,13 @@ class QueueRenderResource(_ValidatingResource):
 
         request.responseHeaders.addRawHeader("content-type", "application/json")
 
-        if not request.args['url']:
+        args = request.args
+
+        if not args['url']:
             request.setResponseCode(400, "Bad Request")
             return
 
-
-        self.redis.rpush(self.local_hostname, request.args['url'])
+        self.redis.rpush(self.local_hostname, args['url'])
 
         return json.dumps({'Status':'Submitted to Queue'})
 
