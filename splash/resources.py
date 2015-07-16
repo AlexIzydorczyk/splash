@@ -27,6 +27,8 @@ from splash.render_options import RenderOptions, BadOption
 from splash.qtutils import clear_caches
 
 import threading
+import socket
+import redis
 
 if lua_is_supported():
     from splash.qtrender_lua import LuaRender
@@ -41,6 +43,25 @@ class _ValidatingResource(Resource):
         except BadOption as e:
             request.setResponseCode(400)
             return str(e) + "\n"
+
+####
+#Redis stuff for review
+class QueueRenderResource(_ValidatingResource):
+    isLeaf = True
+    content_type = "text/html; charset=utf-8"
+
+    def __init__(self, pool, max_timeout, is_proxy_request=False):
+        Resource.__init__(self)
+        self.pool = pool
+        self.js_profiles_path = self.pool.js_profiles_path
+        self.is_proxy_request = is_proxy_request
+        self.max_timeout = max_timeout
+        self.local_hostname = socket.gethostname()
+
+    def render_GET(self, request):
+        
+        return "Your hostname is " + self.local_hostname + "Thanks for calling " + request.args.keys()[0]
+
 
 class BaseRenderResourceBackground(_ValidatingResource):
 
@@ -736,6 +757,9 @@ class Root(Resource):
         self.putChild("render.png", RenderPngResource(pool, max_timeout))
         self.putChild("render.json", RenderJsonResource(pool, max_timeout))
         self.putChild("render.har", RenderHarResource(pool, max_timeout))
+
+
+        self.putChild("queue", QueueRenderResource(pool, max_timeout))
 
         self.putChild("_debug", DebugResource(pool))
         self.putChild("_gc", ClearCachesResource())
