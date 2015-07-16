@@ -71,7 +71,7 @@ class QueueRenderResource(_ValidatingResource):
 
         self.redis.rpush(self.local_hostname, request.args['url'])
 
-        return json.dumps(json.loads({'Status':'Submitted to Queue'}))
+        return json.dumps({'Status':'Submitted to Queue'})
 
 
 
