@@ -126,11 +126,10 @@ def reply2har(reply, include_content=False, binary_content=False):
 
     if include_content:
         data = bytes(reply.readAll())
-        #data = reply.readAll()
 
         if binary_content:
             res["content"]["encoding"] = "binary"
-            res["content"]["text"] = data.decode("ISO-8869-1", errors='ignore')
+            res["content"]["text"] = data
             res["content"]["size"] = len(data)
         else:
             res["content"]["encoding"] = "base64"
