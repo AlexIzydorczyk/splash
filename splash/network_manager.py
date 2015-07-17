@@ -42,7 +42,7 @@ def create_default(filters_path=None, verbosity=None, allowed_schemes=None):
         allowed_schemes=allowed_schemes,
         verbosity=verbosity
     )
-    manager.setCache(manager.custom_cache)
+    #manager.setCache(manager.custom_cache)
     return manager
 
 
@@ -71,6 +71,7 @@ class ProxiedQNetworkAccessManager(QNetworkAccessManager):
         self._next_id = 0
         self.custom_cache = QNetworkDiskCache()
         self.custom_cache.setCacheDirectory("CustomCache")
+        self.setCache(self.custom_cache)
 
         assert self.proxyFactory() is None, "Standard QNetworkProxyFactory is not supported"
 
