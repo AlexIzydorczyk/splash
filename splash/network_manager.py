@@ -70,6 +70,7 @@ class ProxiedQNetworkAccessManager(QNetworkAccessManager):
         self.verbosity = verbosity
         self._next_id = 0
         self.custom_cache = QNetworkDiskCache()
+        self.custom_cache.setCacheDirectory("CustomCache")
 
         assert self.proxyFactory() is None, "Standard QNetworkProxyFactory is not supported"
 
@@ -255,7 +256,10 @@ class ProxiedQNetworkAccessManager(QNetworkAccessManager):
         self.log("Bytes available: " + str(reply.bytesAvailable()))
         self.log("Reply read: " + str(len(bytes(reply.readAll()))))
         self.log("Reply buffer size: " + str(reply.readBufferSize()))
-        self.log("Size of cache: " + str(sys.getsizeof(self.cache)))
+        self.log("Size of cache in memory: " + str(sys.getsizeof(self.cache)))
+
+        data = self.cache.data(reply.url())
+        self.log("Data exists..?" + str(sys.getsizeof(data)))
 
 
         har_entry = self._harEntry()
