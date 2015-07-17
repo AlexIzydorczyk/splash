@@ -113,7 +113,7 @@ class ProxiedQNetworkAccessManager(QNetworkAccessManager):
                 operation, request, outgoingData
             )
             if har_entry is not None:
-                har_entry["response"].update(har_qt.reply2har(reply, include_content=True, binary_content=False))
+                har_entry["response"].update(har_qt.reply2har(reply))
 
             reply.error.connect(self._handleError)
             reply.finished.connect(self._handleFinished)
