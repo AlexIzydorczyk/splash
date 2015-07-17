@@ -122,8 +122,14 @@ class ProxiedQNetworkAccessManager(QNetworkAccessManager):
             reply.finished.connect(self._handleFinished)
             reply.metaDataChanged.connect(self._handleMetaData)
             reply.downloadProgress.connect(self._handleDownloadProgress)
+            reply.readyRead.connect(self._handleReadData)
 
         return reply
+
+    def _handleReadData(self):
+        reply = self.sender()
+        self.log("READY READ - Bytes available: " + str(reply.bytesAvailable()))
+
 
     @contextmanager
     def _proxyApplied(self, request):
