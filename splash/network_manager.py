@@ -257,7 +257,7 @@ class ProxiedQNetworkAccessManager(QNetworkAccessManager):
 
         data = self.cache().data(reply.url())
 
-        self.log("Data exists..?" + base64.b64encode(bytes(data.data())))
+        self.log("Data exists..?" + (bytes(data.data())))
 
 
         har_entry = self._harEntry()
