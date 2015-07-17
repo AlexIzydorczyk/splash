@@ -125,7 +125,9 @@ def reply2har(reply, include_content=False, binary_content=False):
         res["redirectURL"] = ""
 
     if include_content:
-        data = bytes(reply.readAll())
+        #data = bytes(reply.readAll())
+        data = reply.readAll()
+
         if binary_content:
             res["content"]["encoding"] = "binary"
             res["content"]["text"] = data
