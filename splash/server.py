@@ -252,11 +252,11 @@ def default_splash_server(portnum, max_timeout, slots=None,
                           lua_sandbox_allowed_modules=(),
                           verbosity=None):
     from splash import network_manager
-    from PyQt5.QtNetwork import QNetworkDiskCache
 
     #Create Disk Cache
-    default_cache = QNetworkDiskCache()
-    default_cache.setMaximumCacheSize(100)
+    from splash import cache
+
+    default_cache = cache.construct("CustomCache", 100)
 
     manager = network_manager.create_default(
         filters_path=filters_path,
