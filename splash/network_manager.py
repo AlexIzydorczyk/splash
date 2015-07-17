@@ -257,9 +257,10 @@ class ProxiedQNetworkAccessManager(QNetworkAccessManager):
         self.log("Bytes available: " + str(reply.bytesAvailable()))
         self.log("Reply read: " + str(len(bytes(reply.readAll()))))
         self.log("Reply buffer size: " + str(reply.readBufferSize()))
-        self.log("Size of cache in memory: " + str(sys.getsizeof(self.cache)))
+        self.log("Size of cache in memory: " + str(sys.getsizeof(self.hello)))
 
-        data = self.cache().data(reply.url())
+        data = self.custom_cache.data(reply.url())
+
         self.log("Data exists..?" + str(sys.getsizeof(data)))
 
 
