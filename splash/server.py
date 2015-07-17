@@ -256,14 +256,17 @@ def default_splash_server(portnum, max_timeout, slots=None,
 
     #Create Disk Cache
     default_cache = QNetworkDiskCache()
+    default_cache.setMaximumCacheSize(100)
 
     manager = network_manager.create_default(
         filters_path=filters_path,
         verbosity=verbosity,
         allowed_schemes=allowed_schemes,
-        cache=default_cache,
     )
-    manager.setCache(_default_cache(cache_enabled, cache_path, cache_size))
+
+    #manager.setCache(_default_cache(cache_enabled, cache_path, cache_size))
+    manager.setCache(default_cache)
+
     splash_proxy_factory_cls = _default_proxy_factory(proxy_profiles_path)
     js_profiles_path = _check_js_profiles_path(js_profiles_path)
     _set_global_render_settings(js_disable_cross_domain_access)

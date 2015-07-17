@@ -31,7 +31,7 @@ from splash import defaults
 import base64
 import sys
 
-def create_default(filters_path=None, verbosity=None, allowed_schemes=None, cache=None):
+def create_default(filters_path=None, verbosity=None, allowed_schemes=None):
     verbosity = defaults.VERBOSITY if verbosity is None else verbosity
     if allowed_schemes is None:
         allowed_schemes = defaults.ALLOWED_SCHEMES
@@ -40,9 +40,8 @@ def create_default(filters_path=None, verbosity=None, allowed_schemes=None, cach
     manager = SplashQNetworkAccessManager(
         filters_path=filters_path,
         allowed_schemes=allowed_schemes,
-        verbosity=verbosity
+        verbosity=verbosity,
     )
-    manager.setCache(cache)
     return manager
 
 
