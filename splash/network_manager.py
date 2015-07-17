@@ -120,7 +120,7 @@ class ProxiedQNetworkAccessManager(QNetworkAccessManager):
             reply.error.connect(self._handleError)
             reply.finished.connect(self._handleFinished)
             reply.metaDataChanged.connect(self._handleMetaData)
-            reply.downloadProgress.connect(self._handleDownloadProgress)
+            #reply.downloadProgress.connect(self._handleDownloadProgress)
 
         return reply
 
