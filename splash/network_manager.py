@@ -255,9 +255,9 @@ class ProxiedQNetworkAccessManager(QNetworkAccessManager):
         self.log("Reply buffer size: " + str(reply.readBufferSize()))
         self.log("Size of cache in memory: " + str(self.cache().__class__))
 
-        data = self.cache().data(reply.url())
+        #data = self.cache().data(reply.url())
 
-        self.log("Data exists..?" + (bytes(data.data())))
+        #self.log("Data exists..?" + (bytes(data.data())))
 
 
         har_entry = self._harEntry()
@@ -280,7 +280,7 @@ class ProxiedQNetworkAccessManager(QNetworkAccessManager):
                 if har_entry["timings"]["send"] < 1e-6:
                     har_entry["timings"]["send"] = 0
 
-            har_entry["response"].update(har_qt.reply2har(reply, include_content=True, binary_content=False))
+            har_entry["response"].update(har_qt.reply2har(reply, cache=self.cache(), include_content=True, binary_content=True))
 
         self.log("Finished downloading {url}", reply)
 
