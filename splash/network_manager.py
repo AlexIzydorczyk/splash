@@ -31,7 +31,7 @@ from splash import defaults
 import base64
 import sys
 
-def create_default(filters_path=None, verbosity=None, allowed_schemes=None):
+def create_default(filters_path=None, verbosity=None, allowed_schemes=None, cache=None):
     verbosity = defaults.VERBOSITY if verbosity is None else verbosity
     if allowed_schemes is None:
         allowed_schemes = defaults.ALLOWED_SCHEMES
@@ -42,7 +42,7 @@ def create_default(filters_path=None, verbosity=None, allowed_schemes=None):
         allowed_schemes=allowed_schemes,
         verbosity=verbosity
     )
-    #manager.setCache(manager.custom_cache)
+    manager.setCache(cache)
     return manager
 
 
@@ -69,9 +69,6 @@ class ProxiedQNetworkAccessManager(QNetworkAccessManager):
         self.finished.connect(self._finished)
         self.verbosity = verbosity
         self._next_id = 0
-        self.custom_cache = QNetworkDiskCache()
-        self.custom_cache.setCacheDirectory("CustomCache")
-        self.setCache(self.custom_cache)
 
         assert self.proxyFactory() is None, "Standard QNetworkProxyFactory is not supported"
 
@@ -257,11 +254,11 @@ class ProxiedQNetworkAccessManager(QNetworkAccessManager):
         self.log("Bytes available: " + str(reply.bytesAvailable()))
         self.log("Reply read: " + str(len(bytes(reply.readAll()))))
         self.log("Reply buffer size: " + str(reply.readBufferSize()))
-        #self.log("Size of cache in memory: " + str(sys.getsizeof(self.cache)))
+        self.log("Size of cache in memory: " + str(sys.getsizeof(self.cache())))
 
-        data = self.custom_cache.data(reply.url())
+        #data = self.custom_cache.data(reply.url())
 
-        self.log("Data exists..?" + str(sys.getsizeof(data)))
+        #self.log("Data exists..?" + str(sys.getsizeof(data)))
 
 
         har_entry = self._harEntry()
