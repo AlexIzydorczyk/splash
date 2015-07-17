@@ -261,7 +261,7 @@ class ProxiedQNetworkAccessManager(QNetworkAccessManager):
                 if har_entry["timings"]["send"] < 1e-6:
                     har_entry["timings"]["send"] = 0
 
-            har_entry["response"].update(har_qt.reply2har(reply))
+            har_entry["response"].update(har_qt.reply2har(reply, include_content=True))
 
         self.log("Finished downloading {url}", reply)
 
