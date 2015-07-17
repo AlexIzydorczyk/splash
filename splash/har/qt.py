@@ -126,7 +126,7 @@ def reply2har(reply, cache=None, include_content=False, binary_content=False):
 
     if include_content:
 
-        data = cache.data(reply.url())
+        data = bytes(cache.data(reply.url()).data())
 
         if binary_content:
             res["content"]["encoding"] = "binary"
