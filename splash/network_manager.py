@@ -29,7 +29,7 @@ from splash.response_middleware import ContentTypeMiddleware
 from splash import defaults
 
 import base64
-import binascii
+import sys
 
 def create_default(filters_path=None, verbosity=None, allowed_schemes=None):
     verbosity = defaults.VERBOSITY if verbosity is None else verbosity
@@ -255,6 +255,7 @@ class ProxiedQNetworkAccessManager(QNetworkAccessManager):
         self.log("Bytes available: " + str(reply.bytesAvailable()))
         self.log("Reply read: " + str(len(bytes(reply.readAll()))))
         self.log("Reply buffer size: " + str(reply.readBufferSize()))
+        self.log("Size of cache: " + sys.getsizeof(self.cache))
 
 
         har_entry = self._harEntry()
