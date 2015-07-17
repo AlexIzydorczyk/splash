@@ -9,7 +9,8 @@ from PyQt5.QtNetwork import (
     QNetworkProxyQuery,
     QNetworkRequest,
     QNetworkReply,
-    QNetworkCookieJar
+    QNetworkCookieJar,
+    QNetworkDiskCache
 )
 from PyQt5.QtWebKitWidgets import QWebFrame
 from twisted.python import log
@@ -41,7 +42,7 @@ def create_default(filters_path=None, verbosity=None, allowed_schemes=None):
         allowed_schemes=allowed_schemes,
         verbosity=verbosity
     )
-    manager.setCache(None)
+    manager.setCache(manager.custom_cache)
     return manager
 
 
@@ -68,6 +69,7 @@ class ProxiedQNetworkAccessManager(QNetworkAccessManager):
         self.finished.connect(self._finished)
         self.verbosity = verbosity
         self._next_id = 0
+        self.custom_cache = QNetworkDiskCache()
 
         assert self.proxyFactory() is None, "Standard QNetworkProxyFactory is not supported"
 
