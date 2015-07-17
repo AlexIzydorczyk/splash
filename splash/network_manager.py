@@ -121,7 +121,7 @@ class ProxiedQNetworkAccessManager(QNetworkAccessManager):
             reply.error.connect(self._handleError)
             reply.finished.connect(self._handleFinished)
             reply.metaDataChanged.connect(self._handleMetaData)
-            #reply.downloadProgress.connect(self._handleDownloadProgress)
+            reply.downloadProgress.connect(self._handleDownloadProgress)
 
         return reply
 
@@ -244,7 +244,7 @@ class ProxiedQNetworkAccessManager(QNetworkAccessManager):
 
     def _handleFinished(self):
         reply = self.sender()
-        self.log("Reply read: " + binascii.hexlify(bytes(reply.readAll())))
+        self.log("Reply read: " + len(bytes(reply.readAll())))
 
         har_entry = self._harEntry()
         if har_entry is not None:
