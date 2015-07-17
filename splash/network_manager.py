@@ -243,7 +243,7 @@ class ProxiedQNetworkAccessManager(QNetworkAccessManager):
 
     def _handleFinished(self):
         reply = self.sender()
-        self.log("Reply read as {reply}", {base64.b64encode(bytes(reply.readAll()))})
+        self.log("Reply read " + base64.b64encode(bytes(reply.readAll())))
 
         har_entry = self._harEntry()
         if har_entry is not None:
