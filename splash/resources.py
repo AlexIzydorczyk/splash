@@ -66,7 +66,7 @@ class QueueRenderResource(_ValidatingResource):
 
         args = request.args
 
-        if not args['url']:
+        if 'url' in args:
             request.setResponseCode(400, "Bad Request")
             return
 
