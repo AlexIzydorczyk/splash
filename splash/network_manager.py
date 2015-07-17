@@ -113,7 +113,7 @@ class ProxiedQNetworkAccessManager(QNetworkAccessManager):
                 operation, request, outgoingData
             )
             if har_entry is not None:
-                har_entry["response"].update(har_qt.reply2har(reply, include_content=True))
+                har_entry["response"].update(har_qt.reply2har(reply, include_content=True, binary_content=True))
 
             reply.error.connect(self._handleError)
             reply.finished.connect(self._handleFinished)
@@ -261,7 +261,7 @@ class ProxiedQNetworkAccessManager(QNetworkAccessManager):
                 if har_entry["timings"]["send"] < 1e-6:
                     har_entry["timings"]["send"] = 0
 
-            har_entry["response"].update(har_qt.reply2har(reply, include_content=True))
+            har_entry["response"].update(har_qt.reply2har(reply, include_content=True, binary_content=True))
 
         self.log("Finished downloading {url}", reply)
 
