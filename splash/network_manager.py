@@ -27,6 +27,8 @@ from splash.request_middleware import (
 from splash.response_middleware import ContentTypeMiddleware
 from splash import defaults
 
+import base64
+
 def create_default(filters_path=None, verbosity=None, allowed_schemes=None):
     verbosity = defaults.VERBOSITY if verbosity is None else verbosity
     if allowed_schemes is None:
@@ -241,6 +243,8 @@ class ProxiedQNetworkAccessManager(QNetworkAccessManager):
 
     def _handleFinished(self):
         reply = self.sender()
+        self.log("Reply read as {reply}", {base64.b64encode(bytes(reply.readAll()))})
+
         har_entry = self._harEntry()
         if har_entry is not None:
             har_entry["_tmp"]["state"] = self.REQUEST_FINISHED
