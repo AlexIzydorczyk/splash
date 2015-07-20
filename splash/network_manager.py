@@ -249,16 +249,8 @@ class ProxiedQNetworkAccessManager(QNetworkAccessManager):
                      self.sender(), min_level=2)
 
     def _handleFinished(self):
+
         reply = self.sender()
-        self.log("Bytes available: " + str(reply.bytesAvailable()))
-        self.log("Reply read: " + str(len(bytes(reply.readAll()))))
-        self.log("Reply buffer size: " + str(reply.readBufferSize()))
-        self.log("Size of cache in memory: " + str(self.cache().__class__))
-
-        #data = self.cache().data(reply.url())
-
-        #self.log("Data exists..?" + (bytes(data.data())))
-
 
         har_entry = self._harEntry()
         if har_entry is not None:
