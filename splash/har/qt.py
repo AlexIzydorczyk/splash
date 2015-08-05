@@ -125,10 +125,12 @@ def reply2har(reply, cache=None, include_content=False, binary_content=False):
         res["redirectURL"] = ""
 
     if include_content:
-        if cache is not None:
-            data = bytes(cache.data(reply.url()).data())
-        else:
-            data = bytes(reply.readAll())
+        # if cache is not None:
+        #     data = bytes(cache.data(reply.url()).data())
+        # else:
+        #
+        reply.seek(0)
+        data = bytes(reply.readAll())
 
         if binary_content:
             res["content"]["encoding"] = "binary"
