@@ -126,7 +126,11 @@ def reply2har(reply, cache=None, include_content=False, binary_content=False):
 
     if include_content:
         if cache is not None:
-            data = bytes(cache.data(reply.url()).data())
+            try:
+                data = bytes(cache.data(reply.url()).data())
+            except:
+                print unicode(reply.url().toString())
+                data = None
         else:
             data = bytes(reply.readAll())
 
