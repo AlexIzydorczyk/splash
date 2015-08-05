@@ -128,8 +128,10 @@ def reply2har(reply, cache=None, include_content=False, binary_content=False):
         if cache is not None:
             try:
                 data = bytes(cache.data(reply.url()).data())
-            except:
-                data = bytes(reply.readAll())
+            except Exception, e:
+                print str(e)
+                print cache.data(reply.url())
+                data = ""
         else:
             data = bytes(reply.readAll())
 
