@@ -13,9 +13,9 @@ class SplashDiskCache(QNetworkDiskCache):
         print metadata.url()
         metadata.setSaveToDisk(True)
 
-
-        super(SplashDiskCache, self).prepare(metadata)
         print metadata.SaveToDisk()
+        super(SplashDiskCache, self).prepare(metadata)
+
 
     def updateMetaData(self, metadata):
         print "THIS SHOULD BLOCK CACHING FIRST!"
