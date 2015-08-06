@@ -283,6 +283,7 @@ class ProxiedQNetworkAccessManager(QNetworkAccessManager):
         reply = self.sender()
         self._handle_reply_cookies(reply)
 
+
         har_entry = self._harEntry()
         if har_entry is not None:
             if har_entry["_tmp"]["state"] == self.REQUEST_FINISHED:
@@ -299,7 +300,8 @@ class ProxiedQNetworkAccessManager(QNetworkAccessManager):
 
         ###
 
-        self.log(unicode(bytes(self.sender().rawHeaderList())), reply, min_level=1)
+        #self.log(unicode(bytes(self.sender().rawHeaderList())), reply, min_level=1)
+
         self.log("Headers received for {url}", reply, min_level=1)
 
     def _handleDownloadProgress(self, received, total):
