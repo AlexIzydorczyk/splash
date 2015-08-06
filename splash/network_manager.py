@@ -13,7 +13,7 @@ from PyQt5.QtNetwork import (
     QNetworkDiskCache
 )
 
-PyQt5.QtCore import QByteArray
+from PyQt5.QtCore import QByteArray
 
 from PyQt5.QtWebKitWidgets import QWebFrame
 from twisted.python import log
