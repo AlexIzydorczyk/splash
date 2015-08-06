@@ -9,11 +9,12 @@ from splash import defaults
 class SplashDiskCache(QNetworkDiskCache):
 
     def prepare(self, metadata):
+        print "-----------"
         print "THIS SHOULD BLOCK CACHING!"
         print metadata.url()
         metadata.setSaveToDisk(True)
-
-        print metadata.SaveToDisk()
+        print metadata.saveToDisk()
+        print "-----------"
         super(SplashDiskCache, self).prepare(metadata)
 
 
