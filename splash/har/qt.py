@@ -129,7 +129,9 @@ def reply2har(reply, cache=None, include_content=False, binary_content=False):
             try:
                 data = bytes(cache.data(reply.url()).data())
             except Exception, e:
+                print "----"
                 print str(e)
+                print reply.url()
                 print cache.data(reply.url())
                 data = ""
         else:
