@@ -3,7 +3,7 @@ from __future__ import absolute_import
 from PyQt5.QtNetwork import QNetworkDiskCache
 from PyQt5.QtNetwork import QNetworkCacheMetaData
 from PyQt5.QtCore import QIODevice
-from PyQt5.QtCore import QNetworkRequest
+from PyQt5.QtNetwork import QNetworkRequest
 from twisted.python import log
 from splash import defaults
 from PyQt5.QtCore import QByteArray
