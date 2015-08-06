@@ -10,15 +10,17 @@ class SplashDiskCache(QNetworkDiskCache):
 
     def prepare(self, metadata):
         print "THIS SHOULD BLOCK CACHING!"
-        return 0
+        print metadata.url()
+        metadata.setSaveToDisk(True)
+        super(SplashDiskCache, self).prepare(metadata)
 
-    def insert(self, QIODevice):
-        print "THIS SHOULD BLOCK INSERTING!"
-
-
-    def updateMetaData(self, QIODevice):
-        print "THIS SHOULD BLOCK CACHING FIRST!"
-        return 0
+    # def insert(self, QIODevice):
+    #     print "THIS SHOULD BLOCK INSERTING!"
+    #
+    #
+    # def updateMetaData(self, QIODevice):
+    #     print "THIS SHOULD BLOCK CACHING FIRST!"
+    #     return 0
 
 
 def construct(path=defaults.CACHE_PATH, size=defaults.CACHE_SIZE):
