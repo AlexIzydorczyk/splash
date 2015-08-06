@@ -294,7 +294,10 @@ class ProxiedQNetworkAccessManager(QNetworkAccessManager):
             har_entry["_tmp"]["response_start_time"] = now
             har_entry["timings"]["wait"] = har.get_duration(request_sent, now)
 
-        self.log("Headers received for {url}", reply, min_level=3)
+        ###
+        self.log(unicode(bytes(self.sender().rawHeaderList())), reply, min_level=1)
+
+        self.log("Headers received for {url}", reply, min_level=1)
 
     def _handleDownloadProgress(self, received, total):
         har_entry = self._harEntry()
