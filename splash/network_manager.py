@@ -12,6 +12,9 @@ from PyQt5.QtNetwork import (
     QNetworkCookieJar,
     QNetworkDiskCache
 )
+
+PyQt5.QtCore import QByteArray
+
 from PyQt5.QtWebKitWidgets import QWebFrame
 from twisted.python import log
 
@@ -280,6 +283,9 @@ class ProxiedQNetworkAccessManager(QNetworkAccessManager):
         reply = self.sender()
         self._handle_reply_cookies(reply)
 
+        self.sender().setRawHeader(QByteArray("Pragma"), QByteArray("cache"))
+        self.sender().setRawHeader(QByteArray("Cache-Control"), QByteArray("max-age=31556926"))
+
         har_entry = self._harEntry()
         if har_entry is not None:
             if har_entry["_tmp"]["state"] == self.REQUEST_FINISHED:
@@ -295,6 +301,7 @@ class ProxiedQNetworkAccessManager(QNetworkAccessManager):
             har_entry["timings"]["wait"] = har.get_duration(request_sent, now)
 
         ###
+
         self.log(unicode(bytes(self.sender().rawHeaderList())), reply, min_level=1)
 
         self.log("Headers received for {url}", reply, min_level=1)
