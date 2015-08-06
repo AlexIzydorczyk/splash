@@ -264,7 +264,7 @@ def default_splash_server(portnum, max_timeout, slots=None,
         allowed_schemes=allowed_schemes,
     )
 
-    #manager.setCache(_default_cache(cache_enabled, cache_path, cache_size))
+
     manager.setCache(default_cache)
 
     splash_proxy_factory_cls = _default_proxy_factory(proxy_profiles_path)

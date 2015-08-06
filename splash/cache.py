@@ -2,6 +2,7 @@
 from __future__ import absolute_import
 from PyQt5.QtNetwork import QNetworkDiskCache
 from PyQt5.QtNetwork import QNetworkCacheMetaData
+from PyQt5.QtCore import QIODevice
 from twisted.python import log
 from splash import defaults
 
@@ -9,6 +10,9 @@ class SplashDiskCache(QNetworkDiskCache):
 
     def prepare(self, metadata):
         print "THIS SHOULD BLOCK CACHING!"
+
+    def insert(self, QIODevice):
+        print "THIS SHOULD BLOCK INSERTING!"
 
 
 def construct(path=defaults.CACHE_PATH, size=defaults.CACHE_SIZE):
