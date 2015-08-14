@@ -129,10 +129,10 @@ def reply2har(reply, cache=None, include_content=False, binary_content=False):
             try:
                 data = bytes(cache.data(reply.url()).data())
             except Exception, e:
-                print "----"
-                print str(e)
-                print reply.url()
-                print cache.data(reply.url())
+                # print "----"
+                # print str(e)
+                # print reply.url()
+                # print cache.data(reply.url())
                 data = ""
         else:
             data = bytes(reply.readAll())
@@ -145,6 +145,9 @@ def reply2har(reply, cache=None, include_content=False, binary_content=False):
             res["content"]["encoding"] = "base64"
             res["content"]["text"] = base64.b64encode(data)
             res["content"]["size"] = len(data)
+
+        if data == "":
+            res['content']['text'] = "[Splash] No data received"
 
     return res
 
